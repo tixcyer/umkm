@@ -65,6 +65,106 @@
   <body
     class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-200"
   >
+    <!-- Screen Login Overlay -->
+    <div
+      id="login-overlay"
+      class="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-700 space-y-6 text-center"
+      >
+        <div class="space-y-2">
+          <div
+            class="inline-flex bg-indigo-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 p-4 rounded-2xl mb-2"
+          >
+            <i class="fa-solid fa-cash-register text-3xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            Masuk KasirUMKM
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Pilih pengguna & masukkan PIN untuk mengakses sistem.
+          </p>
+        </div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
+              >Pengguna / Role</label
+            >
+            <select
+              id="login-role"
+              class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >
+              <option value="kasir">Kasir (Staf)</option>
+              <option value="admin">Owner / Admin (Akses Penuh)</option>
+            </select>
+          </div>
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
+              >PIN Keamanan</label
+            >
+            <input
+              type="password"
+              id="login-pin"
+              maxlength="6"
+              required
+              placeholder="Masukkan PIN (Default: 1234)"
+              class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+            <p class="text-[11px] text-slate-400 mt-1">
+              *PIN Default Kasir:
+              <span class="font-mono font-bold">1234</span> | Admin:
+              <span class="font-mono font-bold">9999</span>
+            </p>
+          </div>
+          <button
+            type="submit"
+            class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow-lg shadow-indigo-200 dark:shadow-none"
+          >
+            Masuk ke Sistem
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Iklan Setelah Login -->
+    <div
+      id="ad-modal"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"
+    >
+      <div
+        class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 text-center transition-colors border border-indigo-100 dark:border-slate-700 relative overflow-hidden"
+      >
+        <div
+          class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"
+        ></div>
+        <div
+          class="inline-flex bg-gradient-to-tr from-indigo-500 to-purple-500 text-white p-4 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none mb-1"
+        >
+          <i class="fa-solid fa-bullhorn text-3xl"></i>
+        </div>
+        <div class="space-y-2">
+          <h3 class="font-bold text-xl text-slate-800 dark:text-slate-100">
+            Pemberitahuan
+          </h3>
+          <p
+            class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 py-2 px-3 rounded-xl border border-indigo-100 dark:border-indigo-800"
+          >
+            Website ini adalah sebuah contoh yang di buat oleh Ray ASaa
+          </p>
+        </div>
+        <button
+          onclick="closeAdModal()"
+          class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-sm transition shadow-md shadow-indigo-100 dark:shadow-none"
+        >
+          Lanjutkan ke Aplikasi
+        </button>
+      </div>
+    </div>
+
     <!-- Header Navigation -->
     <header
       class="bg-indigo-700 dark:bg-slate-800 text-white shadow-md sticky top-0 z-30 transition-colors"
@@ -86,13 +186,12 @@
               <p
                 class="text-xs text-indigo-200 dark:text-slate-400 hidden sm:block"
               >
-                Website ini hanya contoh Sistem POS & Manajemen Usaha yang di
-                buat oleh Ray
+                Website ini adalah sebuah contoh yang di buat oleh Ray ASaa
               </p>
             </div>
           </div>
 
-          <!-- Navigation Tabs & Theme Toggle -->
+          <!-- Navigation Tabs & User Profile -->
           <div class="flex items-center space-x-2">
             <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-1">
               <button
@@ -106,7 +205,7 @@
               <button
                 onclick="switchTab('products')"
                 id="nav-products"
-                class="px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
+                class="admin-only px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
               >
                 <i class="fa-solid fa-boxes-stacked"></i>
                 <span class="hidden md:inline">Produk</span>
@@ -114,7 +213,7 @@
               <button
                 onclick="switchTab('categories')"
                 id="nav-categories"
-                class="px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
+                class="admin-only px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
               >
                 <i class="fa-solid fa-tags"></i>
                 <span class="hidden md:inline">Kategori</span>
@@ -122,7 +221,7 @@
               <button
                 onclick="switchTab('reports')"
                 id="nav-reports"
-                class="px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
+                class="admin-only px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
               >
                 <i class="fa-solid fa-chart-line"></i>
                 <span class="hidden md:inline">Laporan</span>
@@ -130,12 +229,22 @@
               <button
                 onclick="switchTab('settings')"
                 id="nav-settings"
-                class="px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
+                class="admin-only px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap"
               >
                 <i class="fa-solid fa-gear"></i>
                 <span class="hidden md:inline">Pengaturan</span>
               </button>
             </nav>
+
+            <!-- Shift Status & Action -->
+            <button
+              onclick="toggleShiftModal()"
+              id="btn-shift-status"
+              class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition flex items-center space-x-1"
+            >
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span id="shift-status-text">Shift Tutup</span>
+            </button>
 
             <!-- Theme Toggle Button -->
             <button
@@ -144,6 +253,15 @@
               title="Ganti Tema"
             >
               <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+
+            <!-- Logout Button -->
+            <button
+              onclick="handleLogout()"
+              class="p-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition"
+              title="Keluar"
+            >
+              <i class="fa-solid fa-right-from-bracket"></i>
             </button>
           </div>
         </div>
@@ -284,12 +402,6 @@
                 >
               </div>
               <div
-                class="flex justify-between text-slate-500 dark:text-slate-400"
-              >
-                <span>Pajak (<span id="tax-percent-display">0</span>%)</span>
-                <span id="cart-tax">Rp 0</span>
-              </div>
-              <div
                 class="flex justify-between text-base font-bold text-slate-800 dark:text-slate-100 pt-1 border-t border-slate-200 dark:border-slate-700"
               >
                 <span>Total Pembayaran</span>
@@ -428,10 +540,10 @@
         >
           <div>
             <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">
-              Laporan Penjualan
+              Laporan Penjualan & Shift
             </h1>
             <p class="text-sm text-slate-500 dark:text-slate-400">
-              Ringkasan pendapatan dan riwayat transaksi lengkap.
+              Ringkasan pendapatan, laporan shift kasir, dan riwayat transaksi.
             </p>
           </div>
           <div class="flex items-center space-x-3 w-full sm:w-auto">
@@ -588,10 +700,10 @@
         >
           <div>
             <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">
-              Pengaturan Toko
+              Pengaturan Toko & Keamanan
             </h1>
             <p class="text-sm text-slate-500 dark:text-slate-400">
-              Atur informasi struk, pajak, dan preferensi toko.
+              Atur informasi struk dan PIN keamanan akun.
             </p>
           </div>
           <form
@@ -623,33 +735,49 @@
                 class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               ></textarea>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
+                >Nomor Telepon / WhatsApp</label
+              >
+              <input
+                type="text"
+                id="setting-store-phone"
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div
+              class="border-t border-slate-100 dark:border-slate-700 pt-4 grid grid-cols-2 gap-4"
+            >
               <div>
                 <label
                   class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
-                  >Nomor Telepon / WhatsApp</label
+                  >PIN Kasir</label
                 >
                 <input
-                  type="text"
-                  id="setting-store-phone"
+                  type="password"
+                  id="setting-pin-kasir"
+                  maxlength="6"
+                  required
                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
               <div>
                 <label
                   class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
-                  >Pajak (%)</label
+                  >PIN Admin / Owner</label
                 >
                 <input
-                  type="number"
-                  id="setting-tax-percent"
-                  min="0"
-                  max="100"
-                  value="0"
+                  type="password"
+                  id="setting-pin-admin"
+                  maxlength="6"
+                  required
                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
+
             <div class="flex justify-end pt-2">
               <button
                 type="submit"
@@ -664,6 +792,129 @@
     </main>
 
     <!-- ================= MODALS ================= -->
+
+    <!-- Shift Open/Close Modal -->
+    <div
+      id="shift-modal"
+      class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"
+    >
+      <div
+        class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 transition-colors"
+      >
+        <div
+          class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3"
+        >
+          <h3
+            id="shift-modal-title"
+            class="font-bold text-lg text-slate-800 dark:text-slate-100"
+          >
+            Manajemen Shift Kasir
+          </h3>
+          <button
+            onclick="closeShiftModal()"
+            class="text-slate-400 hover:text-slate-600"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Open Shift View -->
+        <div id="shift-open-container" class="space-y-4">
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Shift saat ini sedang TUTUP. Masukkan jumlah saldo kas awal di laci
+            sebelum membuka transaksi shift baru.
+          </p>
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
+              >Kas Awal Laci (Rp)</label
+            >
+            <input
+              type="number"
+              id="shift-start-cash"
+              min="0"
+              value="100000"
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Contoh: 100000"
+            />
+          </div>
+          <button
+            type="button"
+            onclick="startShift()"
+            class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl text-sm transition"
+          >
+            Buka Shift Sekarang
+          </button>
+        </div>
+
+        <!-- Close Shift View -->
+        <div id="shift-close-container" class="space-y-4 hidden">
+          <div
+            class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-2 text-xs"
+          >
+            <div class="flex justify-between">
+              <span class="text-slate-500 dark:text-slate-400">Kas Awal:</span>
+              <span id="shift-summary-start" class="font-bold">Rp 0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 dark:text-slate-400"
+                >Penjualan Tunai:</span
+              >
+              <span id="shift-summary-cash" class="font-bold">Rp 0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 dark:text-slate-400"
+                >Penjualan Non-Tunai:</span
+              >
+              <span id="shift-summary-noncash" class="font-bold">Rp 0</span>
+            </div>
+            <div
+              class="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 font-bold text-sm"
+            >
+              <span>Ekspektasi Uang Tunai:</span>
+              <span
+                id="shift-summary-expected"
+                class="text-indigo-600 dark:text-indigo-400"
+                >Rp 0</span
+              >
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
+              >Total Uang Fisik Kasir (Rp)</label
+            >
+            <input
+              type="number"
+              id="shift-actual-cash"
+              oninput="calculateShiftDifference()"
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Hitung & masukkan uang tunai di laci..."
+            />
+          </div>
+
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-500 dark:text-slate-400 font-medium"
+              >Selisih Kas:</span
+            >
+            <span
+              id="shift-diff-display"
+              class="font-bold text-slate-700 dark:text-slate-200"
+              >Rp 0</span
+            >
+          </div>
+
+          <button
+            type="button"
+            onclick="closeCurrentShift()"
+            class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-xl text-sm transition"
+          >
+            Tutup & Rekap Shift
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- 1. Product Modal (Add/Edit) -->
     <div
@@ -895,7 +1146,7 @@
               class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2"
               >Metode Pembayaran</label
             >
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onclick="setPaymentMethod('cash')"
@@ -913,15 +1164,6 @@
               >
                 <i class="fa-solid fa-qrcode text-base"></i>
                 <span>QRIS / Trf</span>
-              </button>
-              <button
-                type="button"
-                onclick="setPaymentMethod('tempo')"
-                id="btn-method-tempo"
-                class="py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-xs font-medium transition flex flex-col items-center justify-center space-y-1"
-              >
-                <i class="fa-solid fa-book-bookmark text-base"></i>
-                <span>Tempo / Hutang</span>
               </button>
             </div>
           </div>
@@ -982,22 +1224,6 @@
               <p class="text-xs text-slate-500 dark:text-slate-400">
                 Silakan lakukan pembayaran sesuai total tagihan.
               </p>
-            </div>
-          </div>
-
-          <!-- Tempo Section -->
-          <div id="tempo-payment-section" class="hidden space-y-3">
-            <div>
-              <label
-                class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1"
-                >Nama Pelanggan (Hutang)</label
-              >
-              <input
-                type="text"
-                id="tempo-customer-name"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Masukkan nama pelanggan..."
-              />
             </div>
           </div>
 
@@ -1062,6 +1288,7 @@
             </p>
             <p id="receipt-id" class="text-[10px] text-slate-400 mt-1"></p>
             <p id="receipt-date" class="text-[10px] text-slate-400"></p>
+            <p id="receipt-cashier-name" class="text-[10px] text-slate-400"></p>
           </div>
           <div
             id="receipt-items"
@@ -1078,10 +1305,6 @@
               <span>Diskon:</span>
               <span id="receipt-discount">-Rp 0</span>
             </div>
-            <div class="flex justify-between">
-              <span>Pajak:</span>
-              <span id="receipt-tax">Rp 0</span>
-            </div>
             <div
               class="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200"
             >
@@ -1091,10 +1314,6 @@
             <div class="flex justify-between">
               <span>Metode:</span>
               <span id="receipt-method">Tunai</span>
-            </div>
-            <div class="flex justify-between" id="receipt-customer-row">
-              <span>Pelanggan:</span>
-              <span id="receipt-customer">-</span>
             </div>
             <div class="flex justify-between" id="receipt-cash-row">
               <span>Tunai:</span>
@@ -1196,7 +1415,8 @@
         name: "Kasir UMKM",
         address: "Jl. Contoh No. 123, Kota Anda",
         phone: "081234567890",
-        taxPercent: 0,
+        pinKasir: "1234",
+        pinAdmin: "9999",
       };
 
       let defaultCategories = ["Makanan", "Minuman", "Snack"];
@@ -1523,6 +1743,11 @@
         JSON.parse(localStorage.getItem("umkm_pos_transactions")) || [];
       let currentTheme = localStorage.getItem("umkm_pos_theme") || "light";
 
+      let currentUser =
+        JSON.parse(localStorage.getItem("umkm_pos_user")) || null;
+      let activeShift =
+        JSON.parse(localStorage.getItem("umkm_pos_active_shift")) || null;
+
       let cart = [];
       let activePromo = null;
       let currentPosCategory = "Semua";
@@ -1546,6 +1771,11 @@
           JSON.stringify(transactions),
         );
         localStorage.setItem("umkm_pos_theme", currentTheme);
+        localStorage.setItem("umkm_pos_user", JSON.stringify(currentUser));
+        localStorage.setItem(
+          "umkm_pos_active_shift",
+          JSON.stringify(activeShift),
+        );
       }
 
       function applyTheme() {
@@ -1593,7 +1823,190 @@
         }, 3000);
       }
 
+      // --- LOGIN & ROLE MANAGEMENT ---
+      function handleLogin(e) {
+        e.preventDefault();
+        const role = document.getElementById("login-role").value;
+        const pin = document.getElementById("login-pin").value;
+
+        if (role === "kasir") {
+          if (pin === (storeSettings.pinKasir || "1234")) {
+            currentUser = { role: "kasir", name: "Kasir (Staf)" };
+          } else {
+            showNotification("PIN Kasir salah!", "error");
+            return;
+          }
+        } else {
+          if (pin === (storeSettings.pinAdmin || "9999")) {
+            currentUser = { role: "admin", name: "Admin (Owner)" };
+          } else {
+            showNotification("PIN Admin salah!", "error");
+            return;
+          }
+        }
+
+        saveData();
+        document.getElementById("login-overlay").classList.add("hidden");
+        document.getElementById("login-pin").value = "";
+        applyRolePermissions();
+        openAdModal();
+      }
+
+      function openAdModal() {
+        document.getElementById("ad-modal").classList.remove("hidden");
+      }
+
+      function closeAdModal() {
+        document.getElementById("ad-modal").classList.add("hidden");
+        showNotification(`Selamat datang, ${currentUser.name}!`);
+      }
+
+      function handleLogout() {
+        if (confirm("Apakah Anda yakin ingin keluar dari akun ini?")) {
+          currentUser = null;
+          saveData();
+          checkAuthStatus();
+        }
+      }
+
+      function checkAuthStatus() {
+        if (!currentUser) {
+          document.getElementById("login-overlay").classList.remove("hidden");
+        } else {
+          document.getElementById("login-overlay").classList.add("hidden");
+          applyRolePermissions();
+        }
+      }
+
+      function applyRolePermissions() {
+        const adminEls = document.querySelectorAll(".admin-only");
+        if (currentUser && currentUser.role === "kasir") {
+          adminEls.forEach((el) => el.classList.add("hidden"));
+          switchTab("pos");
+        } else {
+          adminEls.forEach((el) => el.classList.remove("hidden"));
+        }
+        updateShiftUI();
+      }
+
+      // --- SHIFT MANAGEMENT ---
+      function updateShiftUI() {
+        const btn = document.getElementById("btn-shift-status");
+        const txt = document.getElementById("shift-status-text");
+
+        if (activeShift && activeShift.isOpen) {
+          btn.className =
+            "px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center space-x-1";
+          txt.textContent = "Shift Buka";
+        } else {
+          btn.className =
+            "px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition flex items-center space-x-1";
+          txt.textContent = "Shift Tutup";
+        }
+      }
+
+      function toggleShiftModal() {
+        const openBox = document.getElementById("shift-open-container");
+        const closeBox = document.getElementById("shift-close-container");
+
+        if (activeShift && activeShift.isOpen) {
+          openBox.classList.add("hidden");
+          closeBox.classList.remove("hidden");
+
+          // Calculate current shift sales
+          const shiftTrx = transactions.filter(
+            (t) => t.timestamp >= activeShift.startTime,
+          );
+          const cashSales = shiftTrx
+            .filter((t) => t.method === "Tunai")
+            .reduce((sum, t) => sum + t.total, 0);
+          const nonCashSales = shiftTrx
+            .filter((t) => t.method !== "Tunai")
+            .reduce((sum, t) => sum + t.total, 0);
+          const expectedCash = activeShift.startCash + cashSales;
+
+          document.getElementById("shift-summary-start").textContent =
+            formatRupiah(activeShift.startCash);
+          document.getElementById("shift-summary-cash").textContent =
+            formatRupiah(cashSales);
+          document.getElementById("shift-summary-noncash").textContent =
+            formatRupiah(nonCashSales);
+          document.getElementById("shift-summary-expected").textContent =
+            formatRupiah(expectedCash);
+          document.getElementById("shift-actual-cash").value = "";
+          calculateShiftDifference();
+        } else {
+          openBox.classList.remove("hidden");
+          closeBox.classList.add("hidden");
+        }
+        document.getElementById("shift-modal").classList.remove("hidden");
+      }
+
+      function closeShiftModal() {
+        document.getElementById("shift-modal").classList.add("hidden");
+      }
+
+      function startShift() {
+        const startCash =
+          parseFloat(document.getElementById("shift-start-cash").value) || 0;
+        activeShift = {
+          isOpen: true,
+          startTime: Date.now(),
+          startDate: new Date().toLocaleString("id-ID"),
+          startCash: startCash,
+          user: currentUser ? currentUser.name : "Kasir",
+        };
+        saveData();
+        updateShiftUI();
+        closeShiftModal();
+        showNotification("Shift kasir berhasil DIBUKA!");
+      }
+
+      function calculateShiftDifference() {
+        if (!activeShift) return;
+        const shiftTrx = transactions.filter(
+          (t) => t.timestamp >= activeShift.startTime,
+        );
+        const cashSales = shiftTrx
+          .filter((t) => t.method === "Tunai")
+          .reduce((sum, t) => sum + t.total, 0);
+        const expectedCash = activeShift.startCash + cashSales;
+        const actualCash =
+          parseFloat(document.getElementById("shift-actual-cash").value) || 0;
+        const diff = actualCash - expectedCash;
+
+        const diffEl = document.getElementById("shift-diff-display");
+        if (diff === 0) {
+          diffEl.textContent = "Pas / Sesuai (Rp 0)";
+          diffEl.className = "font-bold text-emerald-600 dark:text-emerald-400";
+        } else if (diff > 0) {
+          diffEl.textContent = `Surplus +${formatRupiah(diff)}`;
+          diffEl.className = "font-bold text-indigo-600 dark:text-indigo-400";
+        } else {
+          diffEl.textContent = `Minus ${formatRupiah(diff)}`;
+          diffEl.className = "font-bold text-rose-600 dark:text-rose-400";
+        }
+      }
+
+      function closeCurrentShift() {
+        if (!activeShift) return;
+        activeShift.isOpen = false;
+        activeShift.endTime = Date.now();
+        saveData();
+        updateShiftUI();
+        closeShiftModal();
+        showNotification("Shift kasir telah DITUTUP.");
+      }
+
       function switchTab(tabId) {
+        if (currentUser && currentUser.role === "kasir" && tabId !== "pos") {
+          showNotification(
+            "Akses ditolak: Hanya Admin/Owner yang dapat mengakses menu ini!",
+            "error",
+          );
+          return;
+        }
+
         document
           .querySelectorAll(".tab-content")
           .forEach((el) => el.classList.add("hidden"));
@@ -1602,12 +2015,14 @@
         ["pos", "products", "categories", "reports", "settings"].forEach(
           (t) => {
             const btn = document.getElementById("nav-" + t);
-            if (t === tabId) {
-              btn.className =
-                "px-3 py-2 rounded-lg text-sm font-medium bg-indigo-800 dark:bg-slate-700 text-white transition flex items-center space-x-2 whitespace-nowrap";
-            } else {
-              btn.className =
-                "px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap";
+            if (btn) {
+              if (t === tabId) {
+                btn.className =
+                  "px-3 py-2 rounded-lg text-sm font-medium bg-indigo-800 dark:bg-slate-700 text-white transition flex items-center space-x-2 whitespace-nowrap";
+              } else {
+                btn.className =
+                  "px-3 py-2 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-600 dark:hover:bg-slate-700 transition flex items-center space-x-2 whitespace-nowrap";
+              }
             }
           },
         );
@@ -1622,14 +2037,13 @@
       window.onload = function () {
         applyTheme();
         updateBrandUI();
+        checkAuthStatus();
         renderPOS();
       };
 
       function updateBrandUI() {
         document.getElementById("brand-store-name").innerHTML =
           `${storeSettings.name.split(" ")[0]}<span class="text-indigo-200 dark:text-indigo-400">${storeSettings.name.split(" ").slice(1).join(" ") || ""}</span>`;
-        document.getElementById("tax-percent-display").textContent =
-          storeSettings.taxPercent;
       }
 
       // ================= 1. POS / KASIR LOGIC =================
@@ -1705,6 +2119,15 @@
       }
 
       function addToCart(productId) {
+        if (!activeShift || !activeShift.isOpen) {
+          showNotification(
+            "Buka shift kasir terlebih dahulu untuk memulai transaksi!",
+            "error",
+          );
+          toggleShiftModal();
+          return;
+        }
+
         const product = products.find((p) => p.id === productId);
         if (!product || product.stock <= 0) return;
 
@@ -1790,7 +2213,6 @@
         const subtotalEl = document.getElementById("cart-subtotal");
         const discountEl = document.getElementById("cart-discount");
         const discountRow = document.getElementById("discount-row");
-        const taxEl = document.getElementById("cart-tax");
         const totalEl = document.getElementById("cart-total");
         const checkoutBtn = document.getElementById("btn-checkout");
 
@@ -1799,7 +2221,6 @@
           subtotalEl.textContent = formatRupiah(0);
           discountEl.textContent = formatRupiah(0);
           discountRow.classList.add("hidden");
-          taxEl.textContent = formatRupiah(0);
           totalEl.textContent = formatRupiah(0);
           checkoutBtn.disabled = true;
           return;
@@ -1844,19 +2265,22 @@
           discountRow.classList.add("hidden");
         }
 
-        const afterDiscount = subtotal - discountAmount;
-        const taxAmount = (afterDiscount * storeSettings.taxPercent) / 100;
-        const finalTotal = afterDiscount + taxAmount;
+        const finalTotal = subtotal - discountAmount;
 
         container.innerHTML = html;
         subtotalEl.textContent = formatRupiah(subtotal);
-        taxEl.textContent = formatRupiah(taxAmount);
         totalEl.textContent = formatRupiah(finalTotal);
       }
 
       // ================= CHECKOUT & PAYMENT =================
       function openCheckoutModal() {
         if (cart.length === 0) return;
+        if (!activeShift || !activeShift.isOpen) {
+          showNotification("Buka shift kasir terlebih dahulu!", "error");
+          toggleShiftModal();
+          return;
+        }
+
         const subtotal = cart.reduce(
           (sum, item) => sum + item.price * item.qty,
           0,
@@ -1868,14 +2292,11 @@
           else discountAmount = activePromo.value;
           if (discountAmount > subtotal) discountAmount = subtotal;
         }
-        const taxAmount =
-          ((subtotal - discountAmount) * storeSettings.taxPercent) / 100;
-        const total = subtotal - discountAmount + taxAmount;
+        const total = subtotal - discountAmount;
 
         document.getElementById("checkout-total-display").textContent =
           formatRupiah(total);
         document.getElementById("cash-amount").value = "";
-        document.getElementById("tempo-customer-name").value = "";
         document.getElementById("change-display").textContent = formatRupiah(0);
         renderQuickCashButtons(total);
         setPaymentMethod("cash");
@@ -1890,34 +2311,27 @@
         currentPaymentMethod = method;
         const btnCash = document.getElementById("btn-method-cash");
         const btnTransfer = document.getElementById("btn-method-transfer");
-        const btnTempo = document.getElementById("btn-method-tempo");
 
         const cashSection = document.getElementById("cash-payment-section");
         const transferSection = document.getElementById(
           "transfer-payment-section",
         );
-        const tempoSection = document.getElementById("tempo-payment-section");
 
-        [btnCash, btnTransfer, btnTempo].forEach((b) => {
+        [btnCash, btnTransfer].forEach((b) => {
           b.className =
             "py-2.5 px-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-xs font-medium transition flex flex-col items-center justify-center space-y-1";
         });
         cashSection.classList.add("hidden");
         transferSection.classList.add("hidden");
-        tempoSection.classList.add("hidden");
 
         if (method === "cash") {
           btnCash.className =
             "py-2.5 px-2 rounded-xl border border-indigo-600 bg-indigo-50 dark:bg-slate-700 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 text-xs font-medium transition flex flex-col items-center justify-center space-y-1";
           cashSection.classList.remove("hidden");
-        } else if (method === "transfer") {
+        } else {
           btnTransfer.className =
             "py-2.5 px-2 rounded-xl border border-indigo-600 bg-indigo-50 dark:bg-slate-700 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 text-xs font-medium transition flex flex-col items-center justify-center space-y-1";
           transferSection.classList.remove("hidden");
-        } else {
-          btnTempo.className =
-            "py-2.5 px-2 rounded-xl border border-indigo-600 bg-indigo-50 dark:bg-slate-700 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 text-xs font-medium transition flex flex-col items-center justify-center space-y-1";
-          tempoSection.classList.remove("hidden");
         }
       }
 
@@ -1957,9 +2371,7 @@
           else discountAmount = activePromo.value;
           if (discountAmount > subtotal) discountAmount = subtotal;
         }
-        const taxAmount =
-          ((subtotal - discountAmount) * storeSettings.taxPercent) / 100;
-        const total = subtotal - discountAmount + taxAmount;
+        const total = subtotal - discountAmount;
 
         const cash =
           parseFloat(document.getElementById("cash-amount").value) || 0;
@@ -1990,13 +2402,10 @@
           else discountAmount = activePromo.value;
           if (discountAmount > subtotal) discountAmount = subtotal;
         }
-        const taxAmount =
-          ((subtotal - discountAmount) * storeSettings.taxPercent) / 100;
-        const total = subtotal - discountAmount + taxAmount;
+        const total = subtotal - discountAmount;
 
         let cash = total;
         let change = 0;
-        let customerName = "-";
 
         if (currentPaymentMethod === "cash") {
           cash = parseFloat(document.getElementById("cash-amount").value) || 0;
@@ -2005,17 +2414,6 @@
             return;
           }
           change = cash - total;
-        } else if (currentPaymentMethod === "tempo") {
-          customerName = document
-            .getElementById("tempo-customer-name")
-            .value.trim();
-          if (!customerName) {
-            showNotification(
-              "Nama pelanggan wajib diisi untuk transaksi tempo!",
-              "error",
-            );
-            return;
-          }
         }
 
         cart.forEach((cartItem) => {
@@ -2029,18 +2427,12 @@
           id: "TRX-" + Date.now().toString().slice(-6),
           date: new Date().toLocaleString("id-ID"),
           timestamp: Date.now(),
+          cashier: currentUser ? currentUser.name : "Kasir",
           items: [...cart],
           subtotal: subtotal,
           discount: discountAmount,
-          tax: taxAmount,
           total: total,
-          method:
-            currentPaymentMethod === "cash"
-              ? "Tunai"
-              : currentPaymentMethod === "transfer"
-                ? "QRIS / Transfer"
-                : "Tempo (Hutang)",
-          customer: customerName,
+          method: currentPaymentMethod === "cash" ? "Tunai" : "QRIS / Transfer",
           cash: cash,
           change: change,
         };
@@ -2063,6 +2455,8 @@
           storeSettings.address;
         document.getElementById("receipt-id").textContent = trx.id;
         document.getElementById("receipt-date").textContent = trx.date;
+        document.getElementById("receipt-cashier-name").textContent =
+          "Kasir: " + (trx.cashier || "Staf");
         document.getElementById("receipt-subtotal").textContent = formatRupiah(
           trx.subtotal,
         );
@@ -2076,26 +2470,15 @@
           discRow.classList.add("hidden");
         }
 
-        document.getElementById("receipt-tax").textContent = formatRupiah(
-          trx.tax,
-        );
         document.getElementById("receipt-total").textContent = formatRupiah(
           trx.total,
         );
         document.getElementById("receipt-method").textContent = trx.method;
 
-        const custRow = document.getElementById("receipt-customer-row");
         const cashRow = document.getElementById("receipt-cash-row");
         const changeRow = document.getElementById("receipt-change-row");
 
-        if (trx.method === "Tempo (Hutang)") {
-          custRow.classList.remove("hidden");
-          document.getElementById("receipt-customer").textContent =
-            trx.customer;
-          cashRow.classList.add("hidden");
-          changeRow.classList.add("hidden");
-        } else if (trx.method === "Tunai") {
-          custRow.classList.add("hidden");
+        if (trx.method === "Tunai") {
           cashRow.classList.remove("hidden");
           changeRow.classList.remove("hidden");
           document.getElementById("receipt-cash").textContent = formatRupiah(
@@ -2105,7 +2488,6 @@
             trx.change,
           );
         } else {
-          custRow.classList.add("hidden");
           cashRow.classList.add("hidden");
           changeRow.classList.add("hidden");
         }
@@ -2421,8 +2803,8 @@
                 <div class="space-y-2">
                     <p class="text-xs text-slate-400">ID: <span class="font-bold text-slate-700 dark:text-slate-200">${t.id}</span></p>
                     <p class="text-xs text-slate-400">Waktu: <span class="font-bold text-slate-700 dark:text-slate-200">${t.date}</span></p>
+                    <p class="text-xs text-slate-400">Kasir: <span class="font-bold text-slate-700 dark:text-slate-200">${t.cashier || "Staf"}</span></p>
                     <p class="text-xs text-slate-400">Metode Bayar: <span class="font-bold text-slate-700 dark:text-slate-200">${t.method}</span></p>
-                    ${t.customer && t.customer !== "-" ? `<p class="text-xs text-slate-400">Pelanggan: <span class="font-bold text-slate-700 dark:text-slate-200">${t.customer}</span></p>` : ""}
                     <div class="py-2 border-t border-b border-slate-100 dark:border-slate-700 space-y-1 my-2">
                         <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-1">Daftar Item</p>
                         ${itemsHtml}
@@ -2430,7 +2812,6 @@
                     <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
                         <div class="flex justify-between"><span>Subtotal:</span><span>${formatRupiah(t.subtotal)}</span></div>
                         ${t.discount > 0 ? `<div class="flex justify-between text-emerald-600"><span>Diskon:</span><span>-${formatRupiah(t.discount)}</span></div>` : ""}
-                        <div class="flex justify-between"><span>Pajak:</span><span>${formatRupiah(t.tax)}</span></div>
                     </div>
                     <div class="flex justify-between font-bold text-base pt-1 border-t border-slate-100 dark:border-slate-700">
                         <span>Total Pembayaran:</span>
@@ -2470,12 +2851,11 @@
           "No.": index + 1,
           "ID Transaksi": t.id,
           "Tanggal & Waktu": t.date,
+          Kasir: t.cashier || "Kasir",
           "Metode Pembayaran": t.method,
-          Pelanggan: t.customer || "-",
           "Total Item": t.items.reduce((sum, i) => sum + i.qty, 0),
           "Subtotal (Rp)": t.subtotal,
           "Diskon (Rp)": t.discount || 0,
-          "Pajak (Rp)": t.tax || 0,
           "Total Akhir (Rp)": t.total,
         }));
 
@@ -2487,12 +2867,11 @@
           { wch: 5 }, // No
           { wch: 18 }, // ID Transaksi
           { wch: 20 }, // Tanggal & Waktu
+          { wch: 15 }, // Kasir
           { wch: 18 }, // Metode Pembayaran
-          { wch: 16 }, // Pelanggan
           { wch: 12 }, // Total Item
           { wch: 16 }, // Subtotal
           { wch: 14 }, // Diskon
-          { wch: 14 }, // Pajak
           { wch: 18 }, // Total Akhir
         ];
         worksheet["!cols"] = columnWidths;
@@ -2523,8 +2902,10 @@
           storeSettings.address;
         document.getElementById("setting-store-phone").value =
           storeSettings.phone;
-        document.getElementById("setting-tax-percent").value =
-          storeSettings.taxPercent;
+        document.getElementById("setting-pin-kasir").value =
+          storeSettings.pinKasir || "1234";
+        document.getElementById("setting-pin-admin").value =
+          storeSettings.pinAdmin || "9999";
       }
 
       function saveStoreSettings(e) {
@@ -2538,12 +2919,16 @@
         storeSettings.phone = document
           .getElementById("setting-store-phone")
           .value.trim();
-        storeSettings.taxPercent =
-          parseFloat(document.getElementById("setting-tax-percent").value) || 0;
+        storeSettings.pinKasir = document
+          .getElementById("setting-pin-kasir")
+          .value.trim();
+        storeSettings.pinAdmin = document
+          .getElementById("setting-pin-admin")
+          .value.trim();
 
         saveData();
         updateBrandUI();
-        showNotification("Pengaturan toko berhasil disimpan!");
+        showNotification("Pengaturan toko & PIN berhasil disimpan!");
       }
     </script>
   </body>
